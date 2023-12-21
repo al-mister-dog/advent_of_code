@@ -1,10 +1,28 @@
 require 'pry-byebug'
 
 def sum_calibrations(input)
+  string_to_int = {
+    "one" => "1",
+    "two" => "2",
+    "three" => "3",
+    "four" => "4",
+    "five" => "5",
+    "six" => "6",
+    "seven" => "7",
+    "eight" => "8",
+    "nine" => "9"
+  }
+  answers = []
   input.split("\n").sum(0) do |line|
-    digits = line.scan(/\d/)
-    digits.first.concat(digits.last).to_i
+    digits = line.scan(/#{string_to_int.keys.join("|")}|\d/)
+    first_digit = string_to_int[digits.first] || digits.first
+    last_digit = string_to_int[digits.last] || digits.last
+    last_digit = '' if digits.length == 1
+    output = "#{first_digit}#{last_digit}".to_i
+    answers.push(output)
+    output
   end
+  puts answers
 end
 
 input = <<~HEREDOC
@@ -1010,4 +1028,27 @@ gsntbddbnone4cjqjmspzcsxmvvthreefive
 cqmzqbxzfvonevmmmlxsnjr5zfg
 HEREDOC
 
-puts sum_calibrations(input)
+sum_calibrations(input)
+puts "BREAK"
+DIGITS = %w(one two three four five six seven eight nine)
+  .map.with_index
+  .to_a.to_h
+  .transform_values { _1 + 1 }
+
+# Postive lookahead assertion regex
+answers = []
+input
+  .split("\n")
+  .sum {
+    _1.scan(/(?=(#{DIGITS.keys.join("|")}|\d))/)
+      .flatten
+      .values_at(0, -1)
+      .map { |match| DIGITS[match] || match }
+      .join
+      .to_i
+  }
+  .tap do
+    puts _1
+    answers.push(_1)
+  end
+puts answers
